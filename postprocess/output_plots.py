@@ -22,18 +22,18 @@ from derivative import *
 
 mpl.style.use('classic')
 
-data =np.genfromtxt(pl.path + pl.output_folder + pl.output_file)
+data = np.genfromtxt(pl.path + pl.output_folder + pl.output_file)
 
 # First two lines contain parameters and last line contain time of simulation
 t = data[:,0]
 Ke = data[:,1]
 Ie = data[:,2]
 V_rms = data[:,3]
-Nu_b = data[:,4]
-Nu_t = data[:,5]
-cri = data[:,6]
-p_t = data[:,7]
-g_t = data[:,8]
+F_c = data[:,4]
+F_r = data[:,5]
+F_k = data[:,6]
+cri = data[:,7]
+p_t = data[:,8]
 
 if pl.type == 'energy':
     plt.figure(figsize=(5,3))
@@ -48,51 +48,65 @@ if pl.type == 'energy':
     plt.legend(loc=3, prop={'size': 15}, frameon=False) 
     plt.tight_layout()
     plt.rc('text', usetex=True)          
-    plt.savefig('plots/energy.png')
+    plt.savefig(pl.path + pl.output_folder + 'plots/energy.png', dpi =200)
 
 elif pl.type == 'Nusselt':
     plt.figure(figsize=(5,3))
-    plt.plot(t, Nu_b, label = r'$\mathrm{Nu}_b$', color = 'k')
-    plt.plot(t, Nu_t, label = r'$\mathrm{Nu}_t$', color = 'r')
+    plt.plot(t, (F_r)/(-grid.C4*para.epsilon), label = r'$\mathrm{Nu}$', color = 'k')
     plt.xlabel(r'$t$', fontsize=13)        
     plt.ylabel(r'$\mathrm{Nu}$', fontsize=13)     
     plt.xlim(0, para.tfinal)      
-    # plt.ylim(0,1)
+    # plt.ylim(1,1)
     plt.xticks(fontsize=10)
-    plt.yticks([1,1.1,1.2,1.3],fontsize=10)
-    plt.legend(loc=1, prop={'size': 15}, frameon=False) 
+    plt.yticks(fontsize=10)
+    plt.legend(loc=4, prop={'size': 15}, frameon=False) 
     plt.tight_layout()
     plt.rc('text', usetex=True)          
-    plt.savefig('plots/Nusselt.png')
+    plt.savefig(pl.path + pl.output_folder + 'plots/Nusselt.png', dpi =200)
 
 elif pl.type == 'criteria':
     plt.figure(figsize=(5,3))
     plt.plot(t, np.absolute(cri), label = r'$\langle \left| \frac{\partial T}{\partial z} \right| - \frac{g}{C_p} \rangle$', color = 'k')
-    plt.xlabel(r'$t$', fontsize=13)        
-    # plt.ylabel(r'$Nu$', fontsize=13)     
+    plt.xlabel(r'$t$', fontsize=13)           
     plt.xlim(0, para.tfinal)      
-    # plt.ylim(0,1)
+    # plt.ylim(4e-2,4e-4+4e-2)
     plt.xticks(fontsize=10)
-    plt.yticks([0.405,0.41,0.415,0.42], fontsize=10)
+    plt.yticks(fontsize=10)
     plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
     plt.legend(loc=4, prop={'size': 18}, frameon=False) 
     plt.tight_layout()
     plt.rc('text', usetex=True)          
-    plt.savefig('plots/criteria.png')
+    plt.savefig(pl.path + pl.output_folder + 'plots/criteria.png', dpi =200)
 
 elif pl.type == 'ratio':
     plt.figure(figsize=(5,3))
-    plt.plot(t, (p_t+g_t), label = r'$\langle \frac{\partial p}{\partial z} \rangle + \langle \rho g \rangle$', color = 'k')
+    plt.plot(t[::100], (-p_t[::100]/grid.C3), label = r'$-\langle \frac{1}{\rho} \frac{\partial p}{\partial z} \rangle / g $', color = 'k')
     # plt.plot(t, -g_t, label = r'$\langle \rho g \rangle$', color = 'r')
+    plt.axhline(y = 1, color = 'k', linestyle = '--', dashes=(3, 2), linewidth=1)
     plt.xlabel(r'$t$', fontsize=13)        
     # plt.ylabel(r'$$', fontsize=13)     
     plt.xlim(0, para.tfinal)      
-    # plt.ylim()
+    # plt.ylim(-1.5e-4+1,1e-4+1)
     plt.xticks(fontsize=10)
-    plt.yticks([-0.5e-4,0,1e-4,2e-4],fontsize=10)
+    plt.yticks(fontsize=10)
     plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-    plt.legend(loc=4, prop={'size': 18}, frameon=False) 
+    plt.legend(loc="center right", prop={'size': 18}, frameon=False) 
     plt.tight_layout()
     plt.rc('text', usetex=True)          
-    plt.savefig('plots/ratio.png')
+    plt.savefig(pl.path + pl.output_folder + 'plots/ratio.png', dpi =200)
 
+elif pl.type == 'V_rms':
+    plt.figure(figsize=(5,3))
+    plt.plot(t, V_rms, color = 'k')
+    plt.xlabel(r'$t$', fontsize=13)        
+    plt.ylabel(r'$\langle V_{rms} \rangle$', fontsize=13)     
+    plt.xlim(0, para.tfinal)      
+    plt.plot([], [], ' ', label=r'$\mathrm{Re} = %.2f$' %(V_rms[-1]/grid.C2))
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    plt.ylim(0,0.8e-1)
+    plt.xticks(fontsize=10)
+    plt.yticks([0,0.2e-1,0.4e-1,0.6e-1,0.8e-1],fontsize=10)
+    plt.legend(loc=4, prop={'size': 15}, frameon=False) 
+    plt.tight_layout()
+    plt.rc('text', usetex=True)          
+    plt.savefig(pl.path + pl.output_folder + 'plots/V_rms.png', dpi =200)

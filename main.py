@@ -1,19 +1,19 @@
 import sys
 import time 
-
 sys.path.append("lib")
-
 import para as para
 from compressible import Compressible
 from fns import time_advance_euler, time_advance_RK2, time_advance_RK3
 from boundary import boundary
+sys.path.append("input")
+from init_fields import init_fields
 
 ti = time.time()                    # Initial time
 
 compress = Compressible()           # Making of Compressible object
 compress.set_arrays()               # Setting of all arrays
-compress.init_fields()              # Initiating inital field profiles at initial time
-boundary(compress)                  
+init_fields(compress)               # Initiating initial field profiles at initial time
+boundary(compress)                  # Boundary condition for initial field profiles                
 
 if para.Scheme == 'EULER':
     time_advance_euler(compress)    # Time advance steps using Euler method
